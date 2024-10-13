@@ -70,7 +70,7 @@ contract Entrypoint {
                 }
             }
 
-            // @dev: No need to restore memory pointers, as the rest of the constructor just returns the runtime 
+            // @dev: No need to restore memory pointers, as the rest of the constructor just returns the runtime
             // bytecode
         }
     }
