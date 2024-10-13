@@ -2,14 +2,14 @@
 
 Entrypoint ERC-1967 proxy and storage contract for the UUPS based architecture. Flattened and adapted from OpenZeppelin.
 
-Use with Foundry.
+Use `src/Entrypoint.sol` with Foundry.
 
 # Why?
 
 - no dependencies
 - small focused package
 - smaller bytecode, lower gas consumption, yet still verifiable for explorers
-- easier to audit
+- clear steps, easier to audit
 - easy to plug in to OpenZeppelin based contracts
 - does not brake when OpenZeppelin restructures folders
 

@@ -13,6 +13,12 @@ contract Entrypoint {
     event Upgraded(address indexed implementation);
 
     /**
+     * @dev `keccak256(bytes("Upgraded(address)"))`
+     */
+    uint256 private constant _UPGRADED_EVENT_SIGNATURE =
+        0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b;
+
+    /**
      * @dev The `implementation` of the proxy is invalid.
      */
     error ERC1967InvalidImplementation(address implementation);
@@ -34,29 +40,38 @@ contract Entrypoint {
      *
      */
     constructor(address implementation, bytes memory data) payable {
-        _setImplementation(implementation);
-        emit Upgraded(implementation);
+        assembly {
+            // Revert when implementation address does not contain code
+            if iszero(extcodesize(implementation)) {
+                // revert ERC1967InvalidImplementation(implementation);
+                mstore(0x00, 0x4c9c8ce3)
+                mstore(0x20, implementation)
+                revert(0x1c, 0x24)
+            }
 
-        if (data.length > 0) {
-            (bool success, bytes memory returndata) = implementation.delegatecall(data);
-            if (!success) {
-                assembly ("memory-safe") {
-                    let returndata_size := mload(returndata)
-                    revert(add(32, returndata), returndata_size)
+            // Store a new address in the ERC-1967 implementation slot
+            sstore(_IMPLEMENTATION_SLOT, implementation)
+
+            // emit {Upgraded} event
+            log2(0, 0, _UPGRADED_EVENT_SIGNATURE, implementation)
+
+            // Execute initialization call when function calldata are provided
+            let data_size := mload(data)
+            if data_size {
+                // Call the implementation.
+                // out and outsize are 0 because we don't know the size yet.
+                let result := delegatecall(gas(), implementation, add(32, data), data_size, 0, 0)
+
+                // delegatecall returns 0 on error.
+                if iszero(result) {
+                    // Copy the returned error data and bubble up revert
+                    returndatacopy(0, 0, returndatasize())
+                    revert(0, returndatasize())
                 }
             }
-        }
-    }
 
-    /**
-     * @dev Stores a new address in the ERC-1967 implementation slot.
-     */
-    function _setImplementation(address newImplementation) internal {
-        if (newImplementation.code.length == 0) {
-            revert ERC1967InvalidImplementation(newImplementation);
-        }
-        assembly {
-            sstore(_IMPLEMENTATION_SLOT, newImplementation)
+            // @dev: No need to restore memory pointers, as the rest of the constructor just returns the runtime 
+            // bytecode
         }
     }
 
