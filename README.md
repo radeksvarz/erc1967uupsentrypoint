@@ -15,6 +15,12 @@ Use `src/Entrypoint.sol` with Foundry.
 
 I.e. ideal for the immutable part of the upgradeable project architecture.
 
+# Example usage
+
+https://github.com/radeksvarz/uupsentrypoint_example
+
+Deployed on Sepolia: https://eth-sepolia.blockscout.com/address/0xC0bf4d3F67B0B516930B28A90fe4022F20bEbE96?tab=contract
+
 # Compatibility
 
 Compatible replacement of:

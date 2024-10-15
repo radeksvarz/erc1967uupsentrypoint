@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 /**
  * @notice Entrypoint ERC-1967 proxy and storage contract for the UUPS based architecture
+ * @author @radeksvarz
  * @author Adapted from OpenZeppelin
  * @dev Enables to call initialization function to avoid frontrunning
  */
